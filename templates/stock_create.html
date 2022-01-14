@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+
+<div class="row">
+    <div class="col-sm-4">
+
+        <h3 class="text-center alert alert-info">Add New Stock</h3>
+
+        <form action="" method="POST">
+
+            {% csrf_token %}   
+            {{ form|crispy }}
+            <br>
+            <input type="submit" class="btn btn-success" value="Update Stock">
+            
+        </form>
+
+    </div>
+
+    <div class="col-sm-7 offser-1">
+
+        <h3 class="text-center alert alert-info">Stock Detail</h3>
+
+        {% if stocks %}
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Item Name</th>
+                    <th scope="col">QTY.</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for st in stocks %}
+
+
+                <tr>
+                    <th scope="row">{{st.id}}</th>
+                    <td>{{st.item_name}}</td>
+                    <td>{{st.item_qty}}</td>
+                    
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        {% else %}
+            <h4 class="text-center alert alert-warning">No Records</h4>    
+
+        {% endif %}
+
+    </div>
+
+
+
+</div>
+
+{% endblock content %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<hr>
+<form action="" method="POST">
+    {% csrf_token %}
+<h2 class="text-center alert-danger "id="admin">Update Tommorow Stock</h2>
+<br>
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">No.</th>
+        <th scope="col">Item Name</th>
+        <th scope="col">QTY.</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for key, value in sells.items %}
+            <tr>
+                <td>{{ forloop.counter }}</td><td>{{ key }}</td><td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+<h4>If all stocks are perfect then click submit</h4>
+<h4>agar barabar ni hai to muje call kar</h4>
+<input type="submit" class="btn btn-primary">
+</form>
+{% endblock content %}
+

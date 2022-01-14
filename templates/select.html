@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form }}
+    From Date : <input type="date" class="form-control" name="f_date"> To Date : <input class="form-control" type="date" name="t_date">
+    <br>
+    <br>
+    <input type="submit" class="btn btn-success" value="Show">  
+    <a href="" class="btn btn-success" value="Home">Home</a>
+    
+
+</form>
+
+{% endblock content %}

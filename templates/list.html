@@ -18,6 +18,9 @@
         <thead>
             <tr>
               <th scope="col">No.</th>
+              {% if username %}
+                <th scope="col">User Name</th>
+              {% endif %}
               <th scope="col">Item Name</th>
               <th scope="col">Price</th>
               <th scope="col">Comment</th>
@@ -31,6 +34,11 @@
                     <td>
                         {{ forloop.counter }}
                     </td>
+                    {% if username %}
+                        <td>
+                            {{ i.user_name.username }}
+                        </td>
+                    {% endif %}
                     <td>
                         {{ i.item_name }}
                     </td>
@@ -51,6 +59,11 @@
             </tr>
         </tbody>
     </table>
+
+    {% for sum in sums %}
+        {{ sum.user_name }} : {{ sum.sums }} <br>
+    {% endfor %}
+
     Total Sells = {{ total_sells }}
     <br/>
     <br/>

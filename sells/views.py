@@ -15,8 +15,12 @@ from django.core.mail import send_mail
 import pytz
 from django.utils.timezone import localtime, now
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.views.generic.edit import FormView
+from django.contrib.auth.models import User
+# timezone.activate(pytz.timezone("Asia/Kolkata")) 
+# from django.utils import timezone
+# timezone.localtime(timezone.now())
 
 
 class AddSell(LoginRequiredMixin, FormView):
@@ -53,6 +57,9 @@ class StockListView(LoginRequiredMixin, ListView):
     template_name='stock_list.html'
     
     def get_queryset(self):
+        import datetime
+        now = datetime.datetime.now()
+        print(now,'  ==================================')
         queryset = Stock.objects.filter(user_name=self.request.user)
         return queryset
   
@@ -62,12 +69,25 @@ class ReportView(LoginRequiredMixin, ListView):
     template_name='list.html'
     
     def get_context_data(self, *args, **kwargs):
+        
         timezone.activate(pytz.timezone("Asia/Kolkata")) 
         context = super().get_context_data(**kwargs)
         f_date = t_date = localtime(now()).date()
-        context['data'] = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).order_by("-created_at")
-        total_sells = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
-        context['total_sells'] = total_sells['price__sum']
+        if self.request.user.is_superuser:
+            context['data'] = Sells.objects.filter(created_at__date__range=[f_date, t_date]).order_by("user_name__username")#.group_by('user_name') 
+            total_sells = Sells.objects.filter(created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
+            context['total_sells'] = total_sells['price__sum']  
+            context['username'] = True
+            res = []
+            sums = Sells.objects.filter(created_at__date__range=[f_date, t_date]).values('user_name').annotate(sums = Sum('price'))
+            for i in sums:
+                res.append(i)
+                res[-1]['user_name'] = User.objects.get(id=i['user_name']).username
+            context['sums'] = res
+        else:
+            context['data'] = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).order_by("-created_at")
+            total_sells = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
+            context['total_sells'] = total_sells['price__sum']
         context['f_date'] = f_date
         context['t_date'] = t_date
         return context
@@ -81,8 +101,24 @@ class ReportView(LoginRequiredMixin, ListView):
             t_date = localtime(now()).date()
         else:
             f_date = t_date = localtime(now()).date()
+        context = {}
+        if self.request.user.is_superuser:
+            context['data'] = Sells.objects.filter(created_at__date__range=[f_date, t_date]).order_by("user_name__username")#.group_by('user_name') 
+            total_sells = Sells.objects.filter(created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
+            context['total_sells'] = total_sells['price__sum']  
+            context['username'] = True
+            res = []
+            sums = Sells.objects.filter(created_at__date__range=[f_date, t_date]).values('user_name').annotate(sums = Sum('price'))
+            for i in sums:
+                res.append(i)
+                res[-1]['user_name'] = User.objects.get(id=i['user_name']).username
+            context['sums'] = res
+        else:
+            context['data'] = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).order_by("-created_at")
+            total_sells = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
+            context['total_sells'] = total_sells['price__sum']
+        context['f_date'] = f_date
+        context['t_date'] = t_date
         
-        data = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).order_by("-created_at")
-        total_sells = data.aggregate(Sum('price'))
-        return render(request, 'list.html', {'data':data, 'f_date': f_date, 't_date': t_date, 'total_sells': total_sells['price__sum']})
-
+        
+        return render(request, 'list.html', context)

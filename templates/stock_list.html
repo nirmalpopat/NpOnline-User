@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-              
+
                 {% for i in stock %}
                 {% if i.item_qty > 0 %}
                 <tr>
@@ -27,13 +27,13 @@
                         {{ i.item_name }}
                     </td>
                     <td>
-                        {{ i.item_qty }}  
+                        {{ i.item_qty }}
                     </td>
                     <td>
-                        {{ i.date }}  
+                        {{ i.updated_at.date }}
                     </td>
                     <td>
-                        {{ i.time }}  
+                        {{ i.updated_at.time }}
                     </td>
                 </tr>
                 {% endif %}
@@ -41,6 +41,6 @@
             </tr>
         </tbody>
     </table>
-    
+
     <a href="{% url 'AddSell' %}" class="btn btn-success">Back</a>
 {% endblock content %}

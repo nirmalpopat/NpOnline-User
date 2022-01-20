@@ -23,13 +23,13 @@ class SellsForm(forms.ModelForm):
         # fun.delay(name, subject, message)
         # print(name, subject, message)
 
-        send_mail(
-            subject,
-            message,
-            'popatnirmal2233@gmail.com',
-            ['popatnirmal2233@gmail.com', 'tejalpopat735@gmail.com', 'harshmangvani89@gmail.com'],
-            fail_silently=False,
-        )
+        # send_mail(
+        #     subject,
+        #     message,
+        #     'popatnirmal2233@gmail.com',
+        #     ['popatnirmal2233@gmail.com', 'tejalpopat735@gmail.com', 'harshmangvani89@gmail.com'],
+        #     fail_silently=False,
+        # )
         
         '''stocks =[]
     count = 0

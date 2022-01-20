@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 import pytz
 from django.utils.timezone import localtime, now
+import datetime
 from django.utils import timezone
 from django.db.models import Sum, Count
 from django.views.generic.edit import FormView
@@ -57,10 +58,13 @@ class StockListView(LoginRequiredMixin, ListView):
     template_name='stock_list.html'
     
     def get_queryset(self):
-        import datetime
-        now = datetime.datetime.now()
-        print(now,'  ==================================')
-        queryset = Stock.objects.filter(user_name=self.request.user)
+        print(self.request.user.is_superuser,' ==================')
+        if self.request.user.is_superuser:
+            queryset = Stock.objects.all()
+        else:
+            now = datetime.datetime.now()
+            print(now,'  ==================================')
+            queryset = Stock.objects.filter(user_name=self.request.user)
         return queryset
   
 class ReportView(LoginRequiredMixin, ListView):
@@ -70,9 +74,10 @@ class ReportView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, *args, **kwargs):
         
-        timezone.activate(pytz.timezone("Asia/Kolkata")) 
+        timezone.activate(pytz.timezone("Asia/Kolkata"))
         context = super().get_context_data(**kwargs)
-        f_date = t_date = localtime(now()).date()
+        print(datetime.datetime.now().date(),' ============================')
+        f_date = t_date = datetime.datetime.now().date()
         if self.request.user.is_superuser:
             context['data'] = Sells.objects.filter(created_at__date__range=[f_date, t_date]).order_by("user_name__username")#.group_by('user_name') 
             total_sells = Sells.objects.filter(created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))

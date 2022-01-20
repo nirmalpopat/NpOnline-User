@@ -9,6 +9,9 @@
         <thead>
             <tr>
               <th scope="col">No.</th>
+              {% if request.user.is_superuser %}
+                <th scope="col">User Name.</th>
+              {% endif %}
               <th scope="col">Item Name</th>
               <th scope="col">QTY</th>
               <th scope="col">Date</th>
@@ -22,6 +25,9 @@
                 <tr>
                     <td>
                         {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {{ i.user_name.username }}
                     </td>
                     <td>
                         {{ i.item_name }}

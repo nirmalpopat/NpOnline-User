@@ -5,9 +5,31 @@
 <form method="POST">
     {% csrf_token %}
     {{ form|crispy }}
+
     <br>
     <input type="submit" class="btn btn-success" value="Add">
 
 </form>
 
 {% endblock content %}
+
+{% block script %}
+
+    $(document).ready(function() {
+        $("#div_id_company_name").hide();
+    });
+
+    $('#id_item_name').change(function() {
+        if($(this).val() == 10 || $(this).val() == 9 || $(this).val() == 4){
+            $("#div_id_company_name").show();
+            document.getElementById("id_company_name").required = true;
+        }
+        else{
+            $("#div_id_company_name").hide();
+            document.getElementById("id_company_name").required = false;
+        }
+    });
+
+{% endblock script %}
+
+

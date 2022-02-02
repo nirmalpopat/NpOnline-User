@@ -5,15 +5,18 @@
     Report From Date: {{ f_date }} To Date: {{ t_date }}
 </h2>
 
-<form method="POST">
-    {% csrf_token %}
-    From Date : <input type="date" class="form-control" name="f_date"> To Date : <input class="form-control" type="date" name="t_date">
-    <br>
-    <input type="submit" class="btn btn-primary" value="View">
-    
-    <br>
-</form>
+{% if request.user.is_superuser %}
 
+    <form method="POST">
+        {% csrf_token %}
+        From Date : <input type="date" class="form-control" name="f_date"> To Date : <input class="form-control" type="date" name="t_date">
+        <br>
+        <input type="submit" class="btn btn-primary" value="View">
+        
+        <br>
+</form>
+{% endif %}
+<h1>Report</h1>
     <table class="table">
         <thead>
             <tr>
@@ -22,6 +25,7 @@
                 <th scope="col">User Name</th>
               {% endif %}
               <th scope="col">Item Name</th>
+              <th scope="col">QTY</th>
               <th scope="col">Price</th>
               <th scope="col">Comment</th>
               <th scope="col">Date</th>
@@ -40,7 +44,10 @@
                         </td>
                     {% endif %}
                     <td>
-                        {{ i.item_name }}
+                        {{ i.item_name }} {% if i.company_name %} {{ i.company_name }} {% endif %}
+                    </td>
+                    <td>
+                        {{ i.item_qty }}
                     </td>
                     <td>
                         {{ i.price }}
@@ -60,9 +67,154 @@
         </tbody>
     </table>
 
-    {% for sum in sums %}
-        {{ sum.user_name }} : {{ sum.sums }} <br>
-    {% endfor %}
+    
+    
+
+{% if sells %}
+
+    <h1>Item Wise Total</h1>
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Item Name</th>
+            <th scope="col">QTY</th>
+            <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody> 
+                {% for i, j in sells.items %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {{ i }}
+                    </td>
+
+                    {% for k in j %}
+                        <td>
+                            {{ k }}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+        
+{% endif %}
+
+{% if company_wise_sub_total %}
+
+    <h1>Company Wise Sub Total</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Item Name</th>
+            <th scope="col">Company Name</th>
+            <th scope="col">QTY</th>
+            <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody> 
+                {% for i, j in company_wise_sub_total.items %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    {% for l in i %}
+
+                        <td>
+                            {{ l }}
+                        </td>
+
+                    {% endfor %}
+
+                    {% for k in j %}
+                        <td>
+                            {{ k }}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+
+{% endif %}
+
+{% if company_wise_total %}
+
+    <h1>Company Wise Total</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Company Name</th>
+            <th scope="col">Total</th>
+            </tr>
+        </thead>
+        <tbody> 
+                {% for i, j in company_wise_total.items %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td>
+                        {{ i }}
+                    </td>
+                    <td>
+                        {{ j }}
+                    </td>
+                   
+                </tr>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    
+{% endif %}
+
+
+{% if sums %}
+
+    <h1>Agent Wise Total</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Agent Name</th>
+            <th scope="col">Total</th>
+            </tr>
+        </thead>
+        <tbody> 
+                {% for sum in sums %}
+                <tr>
+                    <td>
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td>
+                        {{ sum.user_name }}
+                    </td>
+                    <td>
+                        {{ sum.sums }}
+                    </td>
+                   
+                </tr>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    
+{% endif %}
 
     Total Sells = {{ total_sells }}
     <br/>

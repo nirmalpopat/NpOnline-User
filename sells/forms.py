@@ -7,9 +7,13 @@ from django.core.mail import send_mail
 class SellsForm(forms.ModelForm):
     class Meta:
         model = Sells
-        fields = ['item_name', 'item_qty', 'price', 'comment']
+        fields = ['item_name', 'company_name', 'item_qty', 'price', 'comment']
         # widgets = {'user_name': forms.HiddenInput()}
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['item_qty'].widget.attrs['min'] = "1"
+        self.fields['item_qty'].widget.attrs['max'] = "5"
     
     def funn(self, user_name):
         

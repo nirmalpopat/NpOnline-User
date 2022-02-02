@@ -2,12 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-# class BaseModel(models.Model):
-#     created_at = models.DateTimeField(auto_now_add=True)  
-#     updated_at = models.DateTimeField(auto_now=True)  
+class CompanyName(models.Model):
+    company_name = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)  
+    updated_at = models.DateTimeField(auto_now=True)  
+    
+    def __str__(self):
+        return self.company_name
   
 class Item(models.Model):
-    item_name = models.CharField(max_length=50)
+    item_name = models.CharField(max_length=50, unique=True)
+    item_price = models.IntegerField(default=0)
+    company_name = models.ForeignKey(CompanyName, on_delete= models.CASCADE,default=None, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True) 
     
@@ -17,7 +23,7 @@ class Item(models.Model):
 class Stock(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     item_name = models.ForeignKey(Item, on_delete = models.CASCADE)
-    item_qty = models.IntegerField()
+    item_qty = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True)  
     
@@ -30,6 +36,7 @@ class Stock(models.Model):
 class Sells(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     item_name = models.ForeignKey(Item, on_delete = models.CASCADE)
+    company_name = models.ForeignKey(CompanyName, on_delete= models.CASCADE, default="", blank=True, null=True)
     item_qty = models.IntegerField(default=1)
     price = models.IntegerField()
     comment = models.CharField(max_length=50, blank=True, null=True)

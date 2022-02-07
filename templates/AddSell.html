@@ -27,8 +27,10 @@
         else{
             $("#div_id_company_name").hide();
             document.getElementById("id_company_name").required = false;
+            document.getElementById("id_company_name").value = null;
         }
-    });
+    }
+    );
 
 {% endblock script %}
 

@@ -42,6 +42,7 @@ class AddSell(LoginRequiredMixin, FormView):
         
         sold_item = Stock.objects.get(item_name = self.request.POST['item_name'], user_name=self.request.user)
         # form.funn(self.request.user.username)
+        sold_item.is_admin_updated = False
         qty = sold_item.item_qty
         qty -= int(self.request.POST['item_qty'])
         sold_item.item_qty = int(qty)

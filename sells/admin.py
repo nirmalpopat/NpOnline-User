@@ -1,34 +1,18 @@
 from django.contrib import admin
-from .models import Stock, Sells, Item, CompanyName
+from .models import Stock, Sells, Item, CompanyName, StockHistory
 # Register your models here.
 
 class StockAdmin(admin.ModelAdmin):
-    list_display = ('user_name','item_name', 'item_qty','created_at', 'updated_at')
-    #prepopulated_fields = {'slug': ('product_name',)}
-    #list_display_links = ('email', 'first_name', 'last_name', 'username')
-    #readonly_fields = ('last_login','date_joined')
-    #ordering = ('-date_joined',)
+    list_display = ('user_name','item_name', 'item_qty', 'is_admin_updated', 'created_at', 'updated_at')
     
-    filter_horizontal = ()
-    list_filter = ()
-    fieldsets = ()
+class StockHistoryAdmin(admin.ModelAdmin):
+    list_display = ('user_name','item_name', 'item_qty', 'is_admin_updated', 'created_at', 'updated_at')
     
 class SellsAdmin(admin.ModelAdmin):
     list_display = ('user_name', 'item_name', 'company_name', 'item_qty', 'price', 'comment', 'created_at', 'updated_at')
-    #prepopulated_fields = {'slug': ('product_name',)}
-    #list_display_links = ('email', 'first_name', 'last_name', 'username')
-    #readonly_fields = ('last_login','date_joined')
-    #ordering = ('-date_joined',)
-    
-    filter_horizontal = ()
-    list_filter = ()
-    fieldsets = ()
     
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'item_name', 'item_price', 'created_at', 'updated_at')
-    
-# admin.site.register(Stock, StocktAdmin)
-# admin.site.register(Sells, SellsAdmin)
 
 class CompanyNameAdmin(admin.ModelAdmin):
     list_display = (
@@ -38,6 +22,7 @@ class CompanyNameAdmin(admin.ModelAdmin):
         )
 
 admin.site.register(Stock, StockAdmin)
+admin.site.register(StockHistory, StockHistoryAdmin)
 admin.site.register(Sells, SellsAdmin)
 admin.site.register(Item, ItemAdmin)
 admin.site.register(CompanyName, CompanyNameAdmin)

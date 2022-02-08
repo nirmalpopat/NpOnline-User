@@ -71,10 +71,10 @@ class ReportView(LoginRequiredMixin, ListView):
     model = Sells
     template_name='list.html'
     
-    def get_context_data(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         
         timezone.activate(pytz.timezone("Asia/Kolkata"))
-        context = super().get_context_data(**kwargs)
+        context = {}
         # print(datetime.datetime.now().date(),' ============================')
         f_date = t_date = datetime.datetime.now().date()
         if self.request.user.is_superuser:
@@ -149,37 +149,94 @@ class ReportView(LoginRequiredMixin, ListView):
             
         context['f_date'] = f_date
         context['t_date'] = t_date
-        return context
+        return render(request, 'list.html', context)
 
     def post(self, request, *args, **kwargs):
         
+        context = {}
+        
         f_date = self.request.POST['f_date']
         t_date = self.request.POST['t_date']
-        if f_date and t_date:
-            pass
-        elif f_date and not t_date:
-            t_date = localtime(now()).date()
-        else:
-            f_date = t_date = localtime(now()).date()
-        context = {}
+        
+        if not f_date and not t_date:
+            f_date = t_date = datetime.datetime.now().date()
+        elif not t_date:
+            t_date = datetime.datetime.now().date()
+        elif not f_date:
+            f_date = datetime.datetime.now()
+        
         if self.request.user.is_superuser:
             context['data'] = Sells.objects.filter(created_at__date__range=[f_date, t_date]).order_by("user_name__username")#.group_by('user_name') 
             total_sells = Sells.objects.filter(created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
             context['total_sells'] = total_sells['price__sum']  
             context['username'] = True
+            
             res = []
             sums = Sells.objects.filter(created_at__date__range=[f_date, t_date]).values('user_name').annotate(sums = Sum('price'))
             for i in sums:
                 res.append(i)
                 res[-1]['user_name'] = User.objects.get(id=i['user_name']).username
             context['sums'] = res
+            
+            
+            
         else:
             context['data'] = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).order_by("-created_at")
             total_sells = Sells.objects.filter(user_name = self.request.user, created_at__date__range=[f_date, t_date]).aggregate(Sum('price'))
             context['total_sells'] = total_sells['price__sum']
+            
+        """ Adding sells to the context """
+        sells = {}
+        for i in context['data']:
+            try:
+                sells[i.item_name.item_name][1] += i.price
+                sells[i.item_name.item_name][0] += i.item_qty
+            except:
+                sells[i.item_name.item_name] = [i.item_qty, i.price]
+        
+        if self.request.user.is_superuser:
+            context['sells'] = sells
+        
+        """ Adding company wise sells to the context """
+        company_wise_sells = []
+        
+        for i in context['data']:
+            temp = {}
+            try:
+                temp['item_name'] = i.item_name.item_name
+                temp['company_name'] = i.company_name.company_name
+                temp['item_qty'] = i.item_qty
+                temp['price'] = i.price
+                company_wise_sells.append(temp)
+                temp = {}
+            except:
+                pass
+        
+        company_wise_sub_total = {}
+        
+        for i in company_wise_sells:
+            try:
+                company_wise_sub_total[i['item_name'], i['company_name']][1] += i['price']
+                company_wise_sub_total[i['item_name'], i['company_name']][0] += i['item_qty']
+            except:
+                company_wise_sub_total[i['item_name'], i['company_name']] = [i['item_qty'], i['price']]
+                
+        if self.request.user.is_superuser:
+            context['company_wise_sub_total'] = company_wise_sub_total
+        
+        
+        company_wise_total = {}
+        
+        for i in company_wise_sells:
+            try:
+                company_wise_total[i['company_name']] += i['price']
+            except:
+                company_wise_total[i['company_name']] = i['price']
+                
+        context['company_wise_total'] = company_wise_total
+            
         context['f_date'] = f_date
         context['t_date'] = t_date
-        
         
         return render(request, 'list.html', context)
     
